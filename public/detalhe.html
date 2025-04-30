@@ -1,0 +1,215 @@
+<!DOCTYPE html> 
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Detalhes</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="shortcut icon" href="img/loop.png" type="image/x-icon">
+  <style>
+    *{
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    .detalhe-container {
+      max-width: 1000px;
+      margin: auto;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-top: 50px;
+      margin-bottom: 150px;
+    }
+
+    .detalhe-img {
+      width: 250px;
+      height: 390px;
+      max-width: 300px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(166, 74, 255, 0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .detalhe-img:hover {
+      transform: scale(1.03);
+    }
+
+    .detalhe-info-box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .detalhe-titulo {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .detalhe-subinfo {
+      font-size: 1rem;
+      color: #ccc;
+      margin-bottom: 10px;
+    }
+
+    .detalhe-desc {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: #e0e0e0;
+      text-align: justify;
+    }
+
+    .btn-assistir {
+      background-color: #a64aff;
+      padding: 14px 32px;
+      font-size: 1.1rem;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      align-self: flex-start;
+      margin-top: 20px;
+      box-shadow: 0 0 10px #a64aff;
+      transition: 0.3s ease;
+    }
+
+    html, body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Conteúdo principal ocupa o espaço disponível */
+.main-content {
+  flex: 1;
+}
+
+/* Estilo do footer já existente */
+.footer {
+  background-color: #111;
+  padding: 30px 40px;
+  border-top: 4px solid #222;
+  background-image: url(../img/fundo\ head.jpg);
+  background-size: cover;
+  flex-wrap: wrap;
+  gap: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto; /* Isso garante que o footer fique no fundo */
+}
+
+    .btn-assistir:hover {
+      background-color: #c180ff;
+      box-shadow: 0 0 20px #c180ff;
+    }
+
+    @media (max-width: 768px) {
+      .detalhe-container {
+        flex-direction: column;
+        align-items: center;
+        padding: 0 10px;
+      }
+
+      .detalhe-img {
+        max-width: 100%;
+      }
+
+      .btn-assistir {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+    <header class="header">
+        <div class="nav">
+        <div class="logo"><img onclick="window.location.href='index.html'" class="loop-logo" src="img/loop.png" alt=""></div>
+    
+        <ul>
+          <li><a href="#" data-filter="serie">Séries</a></li>
+          <li><a href="#" data-filter="filme">Filmes</a></li>
+          <li><a href="#" data-filter="favoritos">Minha Lista</a></li>
+        </ul>
+        
+        </div>
+    
+        <div class="search-bar">
+          <input type="text" id="searchInput" placeholder="Pesquisar filmes ou séries..." />
+          <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" alt="Lupa">
+        </div>
+    
+        <div class="actions">
+          <a href="login.html" class="login-btn">Entrar</a>
+        </div>
+      </header>
+
+      
+<main>
+
+  <div class="detalhe-container" id="detalhe-container">
+    <!-- Conteúdo será carregado via JavaScript -->
+  </div>
+</main>
+
+  <footer class="footer">
+    <div class="footer-section">
+      <img src="img/loop.png" alt="Logo" class="footer-logo">
+      <p>© 2025 Loop Company. Todos os direitos reservados.</p>
+    </div>
+    <div class="footer-nav">
+      <ul>
+        <li><a href="#">Sobre</a></li>
+        <li><a href="#">Serviços</a></li>
+        <li><a href="#">Contato</a></li>
+        <li><a href="#">Suporte</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+  
+    if (!id) {
+      document.getElementById("detalhe-container").innerHTML = "<p>ID não informado.</p>";
+    } else {
+      fetch(`/conteudo/${id}`)
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById("detalhe-container");
+  
+          container.innerHTML = `
+            <img src="${data.capa}" alt="${data.nome}" class="detalhe-img">
+            <div class="detalhe-info-box">
+              <h1 class="detalhe-titulo">${data.nome}</h1>
+              <p class="detalhe-subinfo">${data.data_lancamento} | ${data.duracao} | ${data.tipo}</p>
+              <p class="detalhe-desc">${data.description}</p>
+              <a href="pagamentos.html" class="btn-assistir">Assistir</a>
+            </div>
+          `;
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById("detalhe-container").innerHTML = "<p>Erro ao carregar conteúdo.</p>";
+        });
+    }
+  </script>
+  
+
+</body>
+</html>

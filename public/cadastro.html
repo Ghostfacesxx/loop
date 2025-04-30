@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro</title>
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="shortcut icon" href="img/loop.png" type="image/x-icon">
+</head>
+<body>
+
+<div class="logo">
+    <img onclick="window.location.href='login.html'" class="loop-logo" src="img/back-seta.png" alt="">
+</div>
+
+<div class="container">
+    <div class="form-container">
+        <p class="title">Cadastro</p>
+        <form class="form" id="cadastro-form">
+            <p id="error-msg" style="color: red; font-size: 0.9rem; text-align: center;"></p>
+            <div>
+                <div class="input-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" name="email" id="email" placeholder="Coloque seu email:">
+                </div>
+                <div class="input-group">
+                    <label for="username">Nome</label>
+                    <input type="text" name="username" id="username" placeholder="Coloque seu nome:">
+                </div>
+                <div class="input-group">
+                    <label for="password">Senha</label>
+                    <input type="password" name="password" id="password" placeholder="Coloque sua senha:">
+                </div>
+            </div>
+            <button class="sign">Entrar</button>
+        </form>
+        <div class="social-message">
+            <div class="line"></div>
+            <p class="message">Cadastre por outras formas</p>
+            <div class="line"></div>
+        </div>
+        <div class="social-icons">
+            <button aria-label="Log in with Google" class="icon">
+                <!-- (SVG Google) -->
+            </button>
+            <button aria-label="Log in with Twitter" class="icon">
+                <!-- (SVG Twitter) -->
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+  document.getElementById('cadastro-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value;
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    const res = await fetch('/cadastro', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ email, username, password })
+    });
+
+    const data = await res.json();
+
+    const msg = document.getElementById('error-msg');
+    if (data.success) {
+      window.location.href = '/index.html';
+    } else {
+      msg.textContent = data.message;
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagamento - Loop</title>
+  <link rel="stylesheet" href="css/pagamentos.css">
+  <link rel="shortcut icon" href="img/loop.png" type="image/x-icon">
+</head>
+<body>
+
+<div class="logo">
+  <img onclick="window.location.href='index.html'" class="loop-logo" src="img/back-seta.png" alt="">
+</div>
+
+<div class="container">
+  <div class="payment-container">
+    <h1>Assinar Loop</h1>
+    
+    <div class="subscription-plans">
+      <div class="plan">
+        <h3>Plano Mensal</h3>
+        <p class="price">R$ 29,90</p>
+        <ul>
+          <li>Acesso a todos os filmes e séries</li>
+          <li>Cancelamento a qualquer momento</li>
+          <li>Assista em qualquer dispositivo</li>
+        </ul>
+        <button class="select-plan" data-plan="monthly">Selecionar</button>
+      </div>
+      
+      <div class="plan featured">
+        <div class="popular-badge">Mais popular</div>
+        <h3>Plano Anual</h3>
+        <p class="price">R$ 249,90</p>
+        <p class="saving">Economize R$ 108,90</p>
+        <ul>
+          <li>Acesso a todos os filmes e séries</li>
+          <li>Cancelamento a qualquer momento</li>
+          <li>Assista em qualquer dispositivo</li>
+          <li>Baixe para assistir offline</li>
+        </ul>
+        <button class="select-plan" data-plan="annual">Selecionar</button>
+      </div>
+    </div>
+    
+    <form id="payment-form" style="display:none;">
+      <h2>Informações de Pagamento</h2>
+      
+      <div class="form-group">
+        <label for="card-name">Nome no Cartão</label>
+        <input type="text" id="card-name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="card-number">Número do Cartão</label>
+        <input type="text" id="card-number" placeholder="0000 0000 0000 0000" required>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="expiry">Validade (MM/AA)</label>
+          <input type="text" id="expiry" placeholder="MM/AA" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="cvv">CVV</label>
+          <input type="text" id="cvv" placeholder="123" required>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input placeholder="email@email.com" type="email" id="email" required>
+      </div>
+      
+      <button type="submit" class="submit-payment">Assinar Agora</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.select-plan').forEach(button => {
+    button.addEventListener('click', function() {
+      const plan = this.getAttribute('data-plan');
+      
+      // Remove active class from all plans
+      document.querySelectorAll('.plan').forEach(p => p.classList.remove('active'));
+      
+      // Add active class to selected plan
+      this.parentElement.classList.add('active');
+      
+      // Show payment form
+      document.getElementById('payment-form').style.display = 'block';
+      
+      // Scroll to payment form
+      document.getElementById('payment-form').scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+  
+  document.getElementById('payment-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    alert('Obrigado pela assinatura! Você será redirecionado para assistir ao conteúdo.');
+    window.location.href = 'index.html';
+  });
+</script>
+
+</body>
+</html>

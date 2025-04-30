@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loop</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="shortcut icon" href="img/loop.png" type="image/x-icon">
+  <link rel="stylesheet" href="css/carrossel.css">
+</head>
+<body>
+  <header class="header">
+    <div class="nav">
+    <div class="logo"><img onclick="window.location.href='index.html'" class="loop-logo" src="img/loop.png" alt=""></div>
+
+    <ul>
+      <li><a href="#" data-filter="serie">Séries</a></li>
+      <li><a href="#" data-filter="filme">Filmes</a></li>
+      <li><a href="#" data-filter="favoritos">Minha Lista</a></li>
+    </ul>
+    
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Pesquisar filmes ou séries..." />
+      <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" alt="Lupa">
+    </div>
+
+    <div class="actions">
+      <a href="login.html" class="login-btn">Entrar</a>
+    </div>
+  </header>
+
+  <div class="container-carousel">
+  <div class="carousel">
+    <div class="carousel-track">
+      <img src="img/five-nights.jpg" alt="Imagem 1" class="carousel-image">
+      <img src="img/openheimer.jpg" alt="Imagem 2" class="carousel-image">
+      <img src="img/wolf.jpg" alt="Imagem 3" class="carousel-image">
+    </div>
+  </div>
+</div>
+
+  <section id="conteudo" class="conteudo-grid"></section>
+
+  <footer class="footer">
+    <div class="footer-section">
+      <img src="img/loop.png" alt="Logo" class="footer-logo">
+      <p>© 2025 Loop Company. Todos os direitos reservados.</p>
+    </div>
+    <div class="footer-nav">
+      <ul>
+        <li><a href="#">Sobre</a></li>
+        <li><a href="#">Serviços</a></li>
+        <li><a href="#">Contato</a></li>
+        <li><a href="#">Suporte</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    let conteudo = [];
+    let filteredConteudo = []; // Store filtered content for search and filter
+
+    // Pegar a lista do backend
+    fetch('/conteudo')
+      .then(res => res.json())
+      .then(lista => {
+        conteudo = lista;
+        filteredConteudo = [...lista]; // Initialize filteredConteudo with all content
+        renderizarConteudo(filteredConteudo);
+        renderizarCarousel(lista); // Render carousel after content is loaded
+      });
+
+    // Verifica se o usuário está logado
+    fetch('/session-info')
+      .then(res => res.json())
+      .then(data => {
+        const btn = document.querySelector('.login-btn');
+        if (data.loggedIn) {
+          btn.textContent = 'Perfil';
+          btn.href = data.isAdmin ? 'admin.html' : 'perfil.html'; // Redirect to admin if admin
+        }
+      });
+
+    function renderizarConteudo(lista) {
+      const container = document.getElementById('conteudo');
+      container.innerHTML = '';
+      const favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+
+      lista.forEach(item => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+
+        const isFavorito = favoritos.includes(item.id);
+        const coracao = isFavorito ? '❤️' : '🤍';
+
+        card.innerHTML = `
+  <a href="detalhe.html?id=${item.id}" class="card-link">
+    <img src="${item.capa}" alt="${item.nome}" class="card-img">
+    <h3 class="card-title">${item.nome}</h3>
+    <p class="card-info">${item.duracao} - ${item.tipo}</p>
+  </a>
+  <div class="card-actions">
+    <span class="heart" data-id="${item.id}" style="position: absolute; bottom: 10px; right: 10px; font-size: 20px; cursor: pointer;">${coracao}</span>
+    <a href="pagamento.html" class="watch-button" style="position: absolute; bottom: 10px; left: 10px;">
+      
+    </a>
+  </div>
+`;
+
+        container.appendChild(card);
+      });
+
+      // Ativa clique no coração
+      document.querySelectorAll('.heart').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = parseInt(btn.dataset.id);
+          let favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+
+          if (favoritos.includes(id)) {
+            favoritos = favoritos.filter(fav => fav !== id);
+            btn.textContent = '🤍';
+          } else {
+            favoritos.push(id);
+            btn.textContent = '❤️';
+          }
+
+          localStorage.setItem('favoritos', JSON.stringify(favoritos));
+        });
+      });
+    }
+
+    // Filtro por categoria
+    document.querySelectorAll('[data-filter]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const filtro = link.getAttribute('data-filter');
+        let listaFiltrada = [];
+
+        if (filtro === 'favoritos') {
+          const favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+          listaFiltrada = conteudo.filter(item => favoritos.includes(item.id));
+        } else {
+          listaFiltrada = conteudo.filter(item => item.tipo === filtro);
+        }
+
+        filteredConteudo = listaFiltrada; // Update filtered content
+        renderizarConteudo(filteredConteudo);
+      });
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      let listaFiltrada = conteudo.filter(item =>
+        item.nome.toLowerCase().includes(searchTerm)
+      );
+
+      // Apply category filter if a category is selected
+      const activeFilter = document.querySelector('[data-filter].active');
+      if (activeFilter) {
+        const filtro = activeFilter.getAttribute('data-filter');
+        if (filtro === 'favoritos') {
+          const favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+          listaFiltrada = listaFiltrada.filter(item => favoritos.includes(item.id));
+        } else {
+          listaFiltrada = listaFiltrada.filter(item => item.tipo === filtro);
+        }
+      }
+
+      filteredConteudo = listaFiltrada; // Update filtered content
+      renderizarConteudo(filteredConteudo);
+    });
+
+    function renderizarCarousel(lista) {
+      const carousel = document.getElementById('carousel');
+      carousel.innerHTML = ''; // Clear existing content
+
+      lista.forEach(item => {
+        const carouselItem = document.createElement('div');
+        carouselItem.classList.add('carousel-item');
+        carouselItem.innerHTML = `
+          <img src="${item.capa}" alt="${item.nome}">
+        `;
+        carousel.appendChild(carouselItem);
+      });
+
+      // Add carousel functionality (basic example)
+      let currentIndex = 0;
+      const carouselItems = document.querySelectorAll('.carousel-item');
+      const itemWidth = 200; // Adjust as needed
+      const gap = 10; // Adjust as needed
+
+      function updateCarousel() {
+        carousel.style.transform = `translateX(${-currentIndex * (itemWidth + gap)}px)`;
+      }
+
+      // Example: Basic navigation (replace with more advanced logic)
+      setInterval(() => {
+        currentIndex = (currentIndex + 1) % carouselItems.length;
+        updateCarousel();
+      }, 3000); // Change every 3 seconds
+    }
+
+    const track = document.querySelector('.carousel-track');
+const images = document.querySelectorAll('.carousel-image');
+const total = images.length;
+let index = 0;
+
+function nextSlide() {
+  index = (index + 1) % total;
+  track.style.transform = `translateX(-${index * 100}%)`;
+}
+
+setInterval(nextSlide, 3000);
+
+
+  </script>
+</body>
+</html>
