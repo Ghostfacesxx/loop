@@ -5,14 +5,14 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Conexão com MySQL
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '', // Coloque sua senha do MySQL aqui, se houver
-  database: 'loop_auth'
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'loop_auth'
 });
 
 db.connect(err => {
@@ -171,5 +171,5 @@ app.delete('/delete-conteudo/:id', (req, res) => {
 
 // Iniciar servidor
 app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
